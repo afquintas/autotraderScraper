@@ -4,6 +4,22 @@ from urllib.request import urlopen, Request
 import time
 import random
 
+
+def find_all_link(soup):
+    print('parsing Full  page')
+    base_url = 'https://www.autotrader.com'
+    link_list = []
+    try:
+        for i in soup.find_all('div', class_='display-flex justify-content-between')[1:]:
+            href = i.a['href']
+            link_list.append('{0}{1}'.format(base_url, href))
+
+        print(list)
+        return link_list
+    except:
+        print('Can not listing Link')
+
+
 # this funcion extracting a single page data as all info need from a car
 def extract_page(soup):
     price = soup.find(
@@ -48,13 +64,17 @@ def main():
     user_agents = [
         'Mozilla/5.0 (compatible; Konqueror/3.5; Linux) KHTML/3.5.5 (like Gecko) (Kubuntu)']
 
-    url = 'https://www.autotrader.com/cars-for-sale/vehicledetails.xhtml?listingId=527163493&zip=91402&referrer=%2Fcars-for-sale%2Fsearchresults.xhtml%3Fzip%3D91402%26startYear%3D2015%26numRecords%3D100%26sortBy%3DderivedpriceASC%26incremental%3Dall%26firstRecord%3D0%26seriesCodeList%3DG_CLASS%26marketExtension%3Don%26makeCodeList%3DMB%26searchRadius%3D100&startYear=2015&numRecords=100&firstRecord=0&makeCodeList=MB&searchRadius=100&clickType=alpha'
+    url = input('Insert your link please: ')
     headers = {"User-Agent": random.choice(user_agents)}
-    
+
     page_html = urlopen(Request(url, headers=headers))
     bs = soup(page_html, "html.parser")
 
-    extract_page(bs)
+    links = find_all_link(bs)
+    for link in links:
+        page_html = urlopen(Request(link, headers=headers))
+        bs = soup(page_html, "html.parser")
+        extract_page(bs)
 
 
 if __name__ == '__main__':
